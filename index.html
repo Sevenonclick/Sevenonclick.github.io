@@ -139,6 +139,60 @@
       <div class="body-wrap">
         
   
+    <article id="post-创建一个精准又具有矫正能力的倒计时" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/11/25/创建一个精准又具有矫正能力的倒计时/">创建一个精准又具有矫正能力的倒计时</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="倒计时如果既精确又可以避免各种bug"><a href="#倒计时如果既精确又可以避免各种bug" class="headerlink" title="倒计时如果既精确又可以避免各种bug"></a>倒计时如果既精确又可以避免各种bug</h3><p>本demo依赖moment库处理时间计算（时间计算不是本文章重点）</p>
+<p>下面先简单介绍一下moment在本文章用的地方，如果有兴趣自行百度看文档</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> nowTime = <span class="keyword">new</span> <span class="built_in">Date</span>();<span class="comment">//获取当前时间</span></div><div class="line"><span class="keyword">let</span> targetTime = moment(nowTime).add(<span class="number">90</span>,<span class="string">'seconds'</span>);<span class="comment">//获取90秒后的时间</span></div><div class="line"><span class="built_in">console</span>.info(moment(targetTime).diff(moment(),<span class="string">'seconds'</span>));<span class="comment">//89</span></div></pre></td></tr></table></figure>
+<p>下面开始正题</p>
+<p>比如现在我们想要做一个获取验证码的按钮，下面给这个按钮写点击事件，在最早以前我写计时器都是这样写的</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">getCode</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="keyword">let</span> beginNum = <span class="number">90</span>;</div><div class="line">  <span class="keyword">let</span> showCount = <span class="literal">true</span>;<span class="comment">//用来判断是否显示点击获取验证码按钮</span></div><div class="line">  <span class="keyword">var</span> timer = setInterval(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="keyword">if</span>(beginNum &lt;= <span class="number">0</span>)&#123;</div><div class="line">      showCount = <span class="literal">false</span>;</div><div class="line">      clearInterval(timer);</div><div class="line">      <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    beginNum = beginNum - <span class="number">1</span>;</div><div class="line">  &#125;,<span class="number">1000</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这样写会有很多很多问题，比如如果你的浏览器开启过多页面或者其他应用占内存太多，就会出现js的卡顿，当js卡顿时计算就会不精准，难以达到跟服务器的过期时间相匹配；还有在移动端的时候你会发现另一个有趣的bug，就是如果你点击获取验证码之后，后台这个程序，js会休眠，你过一个小时回到这个应用里面（假设没有被后台杀掉），你会发现计时器还停留在你后台这个app的时间，因为js休眠了，很尴尬的一个问题不是吗</p>
+<p>后来经过启发，我做了另一版倒计时</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">getCode</span>(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="keyword">let</span> beginNum;</div><div class="line">  <span class="keyword">let</span> showCount = <span class="literal">true</span>;</div><div class="line">  <span class="keyword">var</span> timer = setInterval(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="keyword">if</span>(beginNum &lt;= <span class="number">0</span>)&#123;</div><div class="line">      showCount = <span class="literal">false</span>;</div><div class="line">      clearInterval(timer);</div><div class="line">      <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    beginNum = moment(targetTime).diff(moment(),<span class="string">'seconds'</span>);</div><div class="line">  &#125;,<span class="number">1000</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个写法的好处就是，获取到了启动倒计时终点的时间，每隔一秒都会重新获取当前时间进行比对，获取差值，就算后台js被休眠了，当你回到这个应用，很快就会被矫正过来。</p>
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      <a href="/2016/11/25/创建一个精准又具有矫正能力的倒计时/" class="archive-article-date">
+  	<time datetime="2016-11-25T11:17:12.000Z" itemprop="datePublished"><i class="icon-clock"></i>2016-11-25</time>
+</a>
+      
+      
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+
+
+  
     <article id="post-es6-Destructuring" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-inner">
     
